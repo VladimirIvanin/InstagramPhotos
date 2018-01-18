@@ -4,7 +4,7 @@
 
 В настройках обязательно нужно убрать галку с "Disable implicit OAuth:"
 
-Как пользоваться плагином в компоненте:
+Как пользоваться плагином:
 
 ```js
 var myInstagram = new InstagramPhotos({
