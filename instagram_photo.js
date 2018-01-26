@@ -24,6 +24,7 @@ function InstagramPhotos(options) {
     user_id: null,
     access_token: null,
     countPhoto: 20,
+    filterImages: null, // function (image){ return image.tags.indexOf('beauty')}
     done: function () {},
     fail: function () {}
   }
@@ -45,6 +46,19 @@ InstagramPhotos.prototype.init = function () {
 
   self.getPhoto();
 };
+
+InstagramPhotos.prototype._filter = function (images) {
+  var self = this;
+  var result = [];
+
+  if (self.options.filterImages && self.options.filterImages(el)) {
+    $.each(images, function(index, el) {
+        result.unshift(el)
+    });
+  }
+
+  return result;
+}
 
 InstagramPhotos.prototype.validOption = function (options) {
   return options.user_id && options.access_token;
@@ -70,7 +84,11 @@ InstagramPhotos.prototype.getPhoto = function () {
   })
   .done(function(result) {
     if (result.meta && result.meta.code == 200) {
-      done(result.data);
+      if (self.options.filterImages) {
+        done(self._filter(result.data));
+      }else{
+        done(result.data);
+      }
     }else{
       fail(result);
     }
