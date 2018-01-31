@@ -24,7 +24,7 @@ function InstagramPhotos(options) {
     user_id: null,
     access_token: null,
     countPhoto: 20,
-    filterImages: null, // function (image){ return image.tags.indexOf('beauty')}
+    filterImages: null, // function (image){ return image.tags.indexOf('beauty') > -1 }
     done: function () {},
     fail: function () {}
   }
