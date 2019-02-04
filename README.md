@@ -11,6 +11,7 @@ var myInstagram = new InstagramPhotos({
   user_id: 1111112,
   access_token: '111112.1677ed0.9844c23093e34ff290cd09d941e22535',
   countPhoto: 20,
+  filterImages: null, // отфильтровать фото по какому нибудь признаку, например тегу function (image){ return image.tags.indexOf('beauty') > -1 }
   done: function (photos) {
     // тут рисуем вывод фотографий
   },
