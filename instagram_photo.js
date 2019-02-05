@@ -51,11 +51,13 @@ InstagramPhotos.prototype._filter = function (images) {
   var self = this;
   var result = [];
 
-  if (self.options.filterImages && self.options.filterImages(el)) {
+  
     $.each(images, function(index, el) {
-        result.unshift(el)
+       if (self.options.filterImages && self.options.filterImages(el)) {
+         result.unshift(el)
+       }
     });
-  }
+ 
 
   return result;
 }
