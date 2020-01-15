@@ -1,3 +1,4 @@
+
 /**
  * InstagramPhotos
  * Получаем массив фотографий из инстаграмма
@@ -21,6 +22,7 @@ function InstagramPhotos(options) {
   var self = this;
 
   var DEFAULT_OPTIONS = {
+    storageKey: 'InstagramPhotos',
     user_id: null,
     access_token: null,
     countPhoto: 20,
@@ -51,16 +53,17 @@ InstagramPhotos.prototype._filter = function (images) {
   var self = this;
   var result = [];
 
-  
+
     $.each(images, function(index, el) {
        if (self.options.filterImages && self.options.filterImages(el)) {
          result.unshift(el)
        }
     });
- 
+
 
   return result;
 }
+
 
 InstagramPhotos.prototype.validOption = function (options) {
   return options.user_id && options.access_token;
@@ -75,27 +78,55 @@ InstagramPhotos.prototype.getPhoto = function () {
   var done = options.done;
   var fail = options.fail;
 
-  $.ajax({
-    url: url,
-    dataType: 'jsonp',
-    type: 'GET',
-    data: {
-      access_token: access_token,
-      count: countPhoto
-    }
-  })
-  .done(function(result) {
-    if (result.meta && result.meta.code == 200) {
-      if (self.options.filterImages) {
-        done(self._filter(result.data));
-      }else{
-        done(result.data);
+  function ajaxInsta() {
+    $.ajax({
+      url: url,
+      dataType: 'jsonp',
+      type: 'GET',
+      data: {
+        access_token: access_token,
+        count: countPhoto
       }
-    }else{
-      fail(result);
-    }
-  })
-  .fail(function(error) {
-    fail(error);
-  })
+    })
+    .done(function(result) {
+      if (result.meta && result.meta.code == 200) {
+        if (self.options.filterImages) {
+          done(self._filter(result.data));
+          if (localforage && _) {
+            result.time = _.now()
+            localforage.setItem(options.storageKey, result)
+          }
+        }else{
+          done(result.data);
+          if (localforage && _) {
+            result.time = _.now()
+            localforage.setItem(options.storageKey, result)
+          }
+        }
+      }else{
+        fail(result);
+      }
+    })
+    .fail(function(error) {
+      fail(error);
+    })
+  }
+
+  if (localforage && _) {
+    localforage.getItem(options.storageKey).then(function(value) {
+      if(value && value.time < _.now() - 60000) {
+        if (self.options.filterImages) {
+          done(self._filter(value.data));
+        }else{
+          options.done(value.data);
+        }
+      }else{
+        ajaxInsta()
+      }
+    }).catch(function(err) {
+      ajaxInsta()
+    });
+  }else{
+    ajaxInsta()
+  }
 };
