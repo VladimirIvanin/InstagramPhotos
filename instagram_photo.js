@@ -114,7 +114,7 @@ InstagramPhotos.prototype.getPhoto = function () {
 
   if (localforage && _) {
     localforage.getItem(options.storageKey).then(function(value) {
-      if(value && value.time < _.now() - 60000) {
+      if(value && _.now() - value.time > 60000) {
         if (self.options.filterImages) {
           done(self._filter(value.data));
         }else{
